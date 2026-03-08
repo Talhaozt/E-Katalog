@@ -1,5 +1,8 @@
+import 'package:e_katalog/compenents/product_card.dart';
 import 'package:e_katalog/models/product_model.dart';
 import 'package:e_katalog/services/api_service.dart';
+import 'package:e_katalog/views/card_screen.dart';
+import 'package:e_katalog/views/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,6 +18,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String errorMessage = "";
   List<Data> allProducts = [];
   ApiService apiService = ApiService();
+  final Set<int> cartIds = {};
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -45,6 +50,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final filteredProducts = allProducts.where((product){
+      final name = product.name ?? "";
+      return name.toUpperCase().contains(searchQuery.toUpperCase());
+    },).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -61,7 +71,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontWeight: .bold,
                 letterSpacing: 0.5
               ),),
-              IconButton(onPressed: () {},
+              IconButton(onPressed: () {
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CardScreen(products: allProducts, cartIds: cartIds))
+                );
+              },
                 iconSize: 32,
                 icon:
                 
@@ -98,6 +112,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 contentPadding: EdgeInsets.symmetric(vertical: 14)
               ),
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value;
+                });
+              },
             ),
           ),
           SizedBox(height: 16),
@@ -125,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
           else 
             Expanded(child:
             GridView.builder(
-              itemCount: allProducts.length,
+              itemCount: filteredProducts.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 10,
@@ -133,62 +152,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 childAspectRatio: 0.7
                 ),
               itemBuilder: (context, index){
-                final product =allProducts[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 5,
-                      offset: Offset(0, 3)
-                    )
-                   ]
-                  ),
-                  child: Column(
-                    crossAxisAlignment: .start,
-                    children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.vertical(top: Radius.circular(12)),
-                          child: Image.network(product.image ?? "")),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.name ?? "",
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                              fontWeight: .w600
-                            ),),
-                            SizedBox(height: 1,),
-                            Text(product.tagline ?? "",
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12,
-                              overflow: TextOverflow.ellipsis,
-                            ),),
-                            
-                            SizedBox(height: 1,),
-                            
-                            Text(product.price ?? "N/a",
-                              style: TextStyle(
-                                fontWeight: .bold,
-                                color: Colors.blue.shade700
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                    
-                  ),
-                );
-              }
+                final product =filteredProducts[index];
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                     MaterialPageRoute(builder: (context) => ProductDetailScreen(product: product, cartIds: cartIds))
+                     );
+                  },
+                  child: ProductCard(product: product)
+                  
+                  );
+                }
             )
           )
 
