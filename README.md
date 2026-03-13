@@ -18,12 +18,15 @@ Bu proje, kullanıcıların ürünleri kategorize edilmiş bir şekilde inceleye
    ```bash
    git clone https://github.com/Talhaozt/E-Katalog.git
 
-2. Bu proje dizinine gidiniz:
-  cd E-Katalog
+2. ** Bu proje dizinine gidiniz: **
+   ```bash
+   cd E-Katalog
 
-3. Gerekli paketleri indiriniz:
+3. ** Gerekli paketleri indiriniz: **
+   ```bash
    flutter pub get
 
-4. Uygulamayı Çalıştırın:
+5. ** Uygulamayı Çalıştırın: **
 (Bağlı bir emülatör veya gerçek cihaz olduğundan emin olun)
+```bash
   flutter run
